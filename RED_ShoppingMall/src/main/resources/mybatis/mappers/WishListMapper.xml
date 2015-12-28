@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis.mappers.WishListMapper">
+
+	<!-- wishlist_detail -->
+	<resultMap id="WishList_DetailResult" type="WishList_Detail" >
+		<id property="wd_no" column="WD_NO"/>
+		<result property="wd_w_no" column="wd_w_no"/>
+		<result property="wd_p_no" column="wd_p_no"/>
+		<result property="wd_amount" column="wd_amount"/>
+		<result property="wd_price" column="wd_price"/>
+	</resultMap>
+	<select id="selectWishDetail" resultMap="WishList_DetailResult">
+		select * from wishlist_detail
+	</select>
+
+	<!-- wishlist_detail 포함한 결과 -->
+	<resultMap id="WishListResult" type="WishList" >
+		<id property="w_no" column="w_no" />
+		<result property="w_m_id" column="w_m_id"/>
+		<association property="wishList_Detail" resultMap="WishList_DetailResult"/>
+	</resultMap>
+		
+	<select id="selectAll" resultMap="WishListResult"> <!-- 전체 검색 -->
+		select *
+		from wishlist, wishlist_detail
+		where wishlist.w_no = wishlist_detail.wd_w_no
+	</select>
+	
+	<select id="selectByMemberId" parameterType="string" resultMap="WishListResult">	<!-- 아이디로 위리시스트 전체 컬럼 검색 -->
+		select *
+		from wishlist, wishlist_detail
+		where wishlist.w_no = wishlist_detail.wd_w_no
+		and wishlist.w_m_id = #{w_m_id}
+	</select>
+	
+	<select id="selectWnoByMemberId" parameterType="string" resultType="int">	<!-- 아이디로 위시리스트 번호 검색 -->
+		select w_no from wishlist where w_m_id = #{w_m_id}
+	</select>
+	
+	<select id="selectCount" parameterType="string" resultType="int"> <!-- 위시리스트 존재여부 확인 -->
+		select count(*) from wishlist where w_m_id = #{w_m_id}
+	</select>
+	
+	<insert id="insertWish" parameterType="hashmap">	<!-- 위시리스트 처음만들 때 -->
+		insert ALL
+		into WISHLIST VALUES (w_no_seq.NEXTVAL, #{w_m_id})
+		into WISHLIST_DETAIL VALUES(wd_no_seq.NEXTVAL,w_no_seq.currval, #{wd_p_no}, #{wd_amount}, #{wd_price})
+		SELECT * FROM dual
+	</insert>
+	
+	<insert id="insertWishDetail" parameterType="hashmap"> <!-- 위시리스트 상품만 추가 -->
+		insert into	WISHLIST_DETAIL VALUES(wd_no_seq.NEXTVAL, #{wd_w_no}, #{wd_p_no}, #{wd_amount}, #{wd_price})
+	</insert>
+	
+	<delete id="removeProduct" parameterType="hashmap"> <!-- 위시리스트 상품 삭제 -->
+		delete from wishlist_detail where wd_w_no = #{wd_w_no} and wd_p_no = #{wd_p_no}
+	</delete>
+	
+	
+</mapper>
+

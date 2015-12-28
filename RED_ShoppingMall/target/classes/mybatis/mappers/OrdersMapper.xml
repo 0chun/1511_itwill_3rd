@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis.mappers.OrdersMapper">
+	<resultMap type="Orders" id="OrdersResult">
+		<id property="o_no" column="o_no" />
+		<result property="o_m_id" column="m_password" />
+		<result property="o_date" column="o_date" />
+		<result property="o_total" column="o_total" />
+		<result property="o_dcharge" column="o_dcharge" />
+		<result property="o_zipcode" column="o_zipcode" />
+		<result property="o_address" column="o_address" />
+		<result property="o_phone" column="o_phone" />
+		<result property="o_status" column="o_status" />
+		<result property="o_name" column="o_name" />
+	</resultMap>
+	
+	<select id="selectByOrderList" parameterType="String"
+			resultMap="OrdersResult">
+		SELECT *
+		FROM ORDERS
+		WHERE O_M_ID = #{o_m_id}
+		ORDER BY O_DATE DESC
+	</select>
+	
+	<insert id="insertOrder" parameterType="Orders" >
+		<!-- <selectKey keyProperty="o_no" resultType="int" order="BEFORE">
+			CALL NEXT VALUE FOR o_no_seq
+		</selectKey> -->
+		INSERT INTO orders (o_no, o_m_id, o_date, o_total, o_dcharge, o_zipcode, o_address, o_phone, o_status, o_name) 
+			VALUES (o_no_seq.NEXTVAL, #{o_m_id,jdbcType=VARCHAR}, sysdate, #{o_total}, #{o_dcharge}, #{o_zipcode}, #{o_address}, #{o_phone}, #{o_status},#{o_name})
+	</insert>
+<!-- 	<insert id="insertOrderDetail" parameterType="Orders" >
+		INTO orders (o_no, o_m_id, o_date, o_total, o_dcharge, o_zipcode, o_address, o_phone, o_status, o_name) 
+			VALUES (o_no_seq.NEXTVAL, #{o_m_id,jdbcType=VARCHAR}, sysdate, #{o_total}, #{o_dcharge}, #{o_zipcode}, #{o_address}, #{o_phone}, #{o_status},#{o_name})
+	</insert> -->
+</mapper>

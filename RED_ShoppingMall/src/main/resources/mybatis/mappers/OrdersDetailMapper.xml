@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis.mappers.OrdersDetailMapper">
+	<resultMap type="OrdersDetail" id="OrdersDetailResult">
+		<id property="od_no" column="od_no"/>
+		<result property="od_o_no" column="od_o_no"/>
+		<result property="od_p_no" column="od_p_no"/>
+		<result property="od_amount" column="od_amount"/>
+		<result property="od_price" column="od_price"/>
+	</resultMap>
+	
+	<!-- 
+		this.od_no = od_no;
+		this.od_o_no = od_o_no;
+		this.od_p_no = od_p_no;
+		this.od_amount = od_amount;
+		this.od_price = od_price;		
+	 -->
+	<select id="selectByOrderNo" 
+	parameterType="java.lang.Integer" 
+	resultMap="OrdersDetailResult">
+		SELECT od_no, od_o_no, od_p_no, od_amount, od_price
+		FROM orders_detail
+		WHERE od_o_no = #{od_o_no}
+	</select>
+	
+	<insert id="insertOrdDetatil" parameterType="java.util.Map">
+		INSERT INTO ORDERS_DETAIL 
+		(od_no, od_o_no, od_p_no, od_amount, od_price, od_option)
+		VALUES 
+		(OD_NO_SEQ.NEXTVAL, O_NO_SEQ.CURRVAL,
+		 #{p_no}, #{p_count}, #{p_price},#{p_option})
+	</insert>
+	
+	<delete id="removeOrdDetail" parameterType="java.util.Map">
+		DELETE FROM orders_detail
+		WHERE od_o_no=#{od_o_no}
+		AND od_p_no=#{od_p_no}
+	</delete>
+</mapper>
+

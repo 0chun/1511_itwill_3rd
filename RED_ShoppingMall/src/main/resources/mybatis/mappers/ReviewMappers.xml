@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="mybatis.mappers.ReviewMappers">
+	<resultMap id="ReviewResult" type="Review" >
+		<id property="r_no" column="r_no"/>
+		<result property="r_p_no" column="r_p_no"/>
+		<result property="r_price" column="r_price"/>
+		<result property="r_design" column="r_design"/>
+		<result property="r_quality" column="r_quality"/>
+		<result property="r_nickName" column="r_nickName"/>
+		<result property="r_summary" column="r_summary"/>
+		<result property="r_review" column="r_review"/>
+		<result property="r_date" column="r_date"/>
+		<result property="r_m_id" column="r_m_id"/>
+	</resultMap>
+	
+	<!-- 12월7일 페이징 -->
+	<select id="findReviewIdPaging" parameterType="java.util.Map" resultMap="ReviewResult">
+	<![CDATA[ 
+		select * from
+		(
+  		  select rownum idx, s.*
+  		  from
+  			( select r_no, r_p_no, r_price, r_design, r_quality, r_nickName, r_summary, r_review, r_date, r_m_id
+    		  from reviews
+    		  order by r_no desc
+  			)s
+		)
+		where r_m_id=#{r_m_id} and idx>#{startRowNum}= and idx<=#{endRowNum}
+		]]>
+	</select>
+	
+	<select id="findReviewNo" parameterType="int" resultMap="ReviewResult">
+		select * from reviews where r_no = #{r_no}
+	</select>
+	
+	<select id="findReviewProductNo" parameterType="int" resultMap="ReviewResult">
+		select * from reviews where r_p_no = #{r_p_no} order by r_no desc
+	</select>
+	
+	<select id="findReviewNick" parameterType="String" resultMap="ReviewResult">
+		select * from reviews where r_nickName = #{r_nickName}
+	</select>
+	 
+	<select id="findAllReview" resultMap="ReviewResult">
+		select * from reviews
+	</select>
+	 
+	<!-- 11월 27일 상품대표 별점 추가 -->
+	<select id="findAvgReview" parameterType="int" resultType="int">
+		select round((avg(r_price)+avg(r_quality)+avg(r_design))/3) from reviews where r_p_no=#{r_p_no} group by r_p_no
+	</select> 
+	<!-- 11월 30일 메인 추가 -->
+	<select id="findAvgReviewList" parameterType="int" resultType="Integer">
+		select round((avg(r_price)+avg(r_quality)+avg(r_design))/3) from reviews where r_p_no=#{r_p_no} group by r_p_no
+	</select> 
+	<!-- 12월 2일 추가 -->
+	<select id="findReviewId" parameterType="String" resultMap="ReviewResult">
+		select * from reviews where r_m_id = #{r_m_id} order by r_date desc
+	</select>
+	<!-- 12월3일 추가 -->
+	<select id="findReviewIDResult" parameterType="String" resultType="java.util.Map">
+		select p.p_image, r.r_nickName, r.r_design, r.r_quality, r.r_price, r.r_summary, r.r_review, r.r_date, r.r_p_no, p.p_name,r.r_no
+		from reviews r
+		join product p
+		on r.r_p_no = p.p_no and r.r_m_id= #{r_m_id}
+		order by r.r_date desc
+	</select>
+	
+	<select id="findAllReviewCount" resultType="int">
+		select count(*) from reviews
+	</select>
+	
+	<select id="findReviewProductCount" parameterType="int" resultType="int">
+		select count(*) from reviews where r_p_no = #{r_p_no}
+	</select>
+	
+	<select id="findReviewIdCount" parameterType="String" resultType="int">
+		select count(*) from reviews where r_m_id = #{r_m_id}
+	</select>
+	
+	<insert id="insertReview" parameterType="com.itwill.red.dto.Reviews" >
+		<!-- <selectKey keyProperty="r_no" resultType="int" order="BEFORE">
+			CALL NEXT VALUE FOR R_NO_SEQ
+		</selectKey> -->
+		insert into reviews
+		(r_no, r_p_no, r_price, r_design, r_quality, r_nickName, r_summary, r_review, r_date, r_m_id)
+		values
+		(r_no_seq.nextval, #{r_p_no}, #{r_price},#{r_design},#{r_quality}, #{r_nickName},#{r_summary},#{r_review}, sysdate,#{r_m_id})
+	</insert>
+
+	 
+	<update id="updateReview" parameterType="com.itwill.red.dto.Reviews">
+		update reviews 
+		set 
+		r_price=#{r_price}, 
+		r_design=#{r_design}, 
+		r_quality=#{r_quality}, 
+		r_nickname=#{r_nickName}, 
+		r_summary=#{r_summary}, 
+		r_review=#{r_review} 
+		where 
+		r_no=#{r_no}
+	</update>
+	
+	<delete id="deleteReview" parameterType="int">
+		delete
+		from
+		reviews
+		where r_no = #{r_no}
+	</delete> 
+
+	
+	
+</mapper>

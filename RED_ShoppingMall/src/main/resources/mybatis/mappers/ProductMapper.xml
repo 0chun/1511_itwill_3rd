@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis.mappers.ProductMapper">
+	<resultMap id="ProductResult" type="Product">
+		<id property="p_no" column="p_no" />
+		<result property="p_name" column="p_name" />
+		<result property="p_price" column="p_price" />
+		<result property="p_detail" column="p_detail" />
+		<result property="p_indate" column="p_indate" />
+		<result property="p_sell" column="p_sell" />
+		<result property="p_score" column="p_score" />
+		<result property="p_discount" column="p_discount" />
+		<result property="p_size" column="p_size" />
+		<result property="p_color" column="p_color" />
+		<result property="p_ccode" column="p_ccode" />
+		<result property="p_image" column="p_image" />
+		<result property="p_compay" column="p_company" />
+	</resultMap>
+	<select id="findProductByNo" parameterType="int" resultMap="ProductResult">
+		select
+		p_no,p_name,p_price,p_detail,p_indate,p_sell,p_score,p_discount,p_size,p_color,p_ccode,p_image,p_company
+		from product
+		where p_no=#{p_no}
+	</select>
+
+	<select id="findAllProduct" resultMap="ProductResult">
+		select * from product
+	</select>
+
+	<select id="findProductByName" parameterType="string" resultMap="ProductResult">
+		select
+		p_no,p_name,p_price,p_detail,p_indate,p_sell,p_score,p_discount,p_size,p_color,p_ccode,p_image,p_company
+		from product
+		where p_name=#{p_name}
+	</select>
+	<select id="selectByProductPrice" parameterType="java.util.Map"
+		resultMap="ProductResult">
+		select
+		p_no,p_name,p_price,p_detail,p_indate,p_sell,p_score,p_discount,p_size,p_color,p_ccode,p_image,p_company
+		from product
+		where p_price between #{start_price} and #{end_price}
+	</select>
+	<select id="selectByCompany" parameterType="string" resultMap="ProductResult">
+		select
+		p_no,p_name,p_price,p_detail,p_indate,p_sell,p_score,p_discount,p_size,p_color,p_ccode,p_image,p_company
+		from product
+		where p_company=#{p_company}
+	</select>
+	<insert id="createProduct" parameterType="Product">
+		INSERT INTO PRODUCT
+		(p_no, p_name, p_price, p_indate, p_sell,
+		p_score, p_discount, p_size,
+		p_color, p_ccode, p_image, p_company
+		,p_detail)
+		VALUES(p_no_seq.NEXTVAL, #{p_price}, #{p_indate}, #{p_sell},
+		#{p_score}, #{p_discount},
+		#{p_discount}, #{p_size}, #{p_color},
+		#{p_ccode}, #{p_image},
+		#{p_compay}, #{p_detail})
+	</insert>
+
+	<select id="bestSellProduct" resultMap="ProductResult">
+		SELECT * FROM
+		(SELECT
+		ROWNUM RNUM, A.* FROM
+		(SELECT * FROM PRODUCT ORDER BY P_SELL DESC) A)
+	</select>
+
+	<select id="upSellProduct" resultMap="ProductResult">
+		SELECT * FROM
+		(SELECT ROWNUM
+		RNUM, A.* FROM
+		(SELECT * FROM PRODUCT ORDER BY P_DISCOUNT DESC) A)
+	</select>
+
+	<select id="relationProduct" parameterType="java.util.Map"
+		resultMap="ProductResult">
+		SELECT * FROM
+		(SELECT ROWNUM RNUM, A.* FROM
+		(SELECT * FROM
+		PRODUCT WHERE P_CCODE=#{code}) A)
+		WHERE RNUM &lt;= #{count}
+	</select>
+
+	<select id="relationsProductRandomList" resultMap="ProductResult">
+		SELECT *
+		FROM
+		product
+		WHERE p_discount >= 10
+		OR p_score >= 4
+		OR p_sell >= 100
+	</select>
+	<!-- 충만 맵핑 너무 당황하지마세요~~ -->
+
+
+	<select id="searchProductList" parameterType="java.util.Map"
+		resultMap="ProductResult">
+		SELECT * FROM product
+		<where>
+			<choose>
+				<when test="p_search == null and p_ccode == 10">
+					p_ccode LIKE 1 || '%'
+				</when>
+				<when test="p_search == null and p_ccode == 20">
+					p_ccode LIKE 2 || '%'
+				</when>
+				<when test="p_search == null and p_ccode != 10 and p_ccode != 20">
+					<if test="p_search == null">
+						p_ccode = #{p_ccode}
+					</if>
+				</when>
+				<when test="p_search != null">
+					<if test="p_ccode != 0">
+						p_ccode = #{p_ccode}
+					</if>
+					AND p_company like '%' || #{p_search} || '%'
+					union
+					SELECT * FROM
+					product where
+					p_name like '%' || #{p_search} || '%'
+					union
+					SELECT *
+					FROM product where
+					p_detail like '%' || #{p_search} || '%'
+				</when>
+			</choose>
+		</where>
+	</select>
+
+
+	<!-- 영준 추가 : 카테고리 검색 -->
+	<!-- select * from product where p_ccode like '1%'; -->
+	<select id="findProductByCode" parameterType="int" resultMap="ProductResult">
+		select
+		p_no,p_name,p_price,p_detail,p_indate,p_sell,p_score,p_discount,p_size,p_color,p_ccode,p_image,p_company
+		from product
+		where p_ccode like #{p_ccode}||'%'
+	</select>
+	
+	<!--  -->
+	<select id="bestSellProductByNum" parameterType="int" resultMap="ProductResult">
+		SELECT * FROM
+		(SELECT
+		ROWNUM RNUM, A.* FROM
+		(SELECT * FROM PRODUCT ORDER BY P_SELL) A)
+		WHERE RNUM &lt;= #{i}
+	</select>
+	
+		<select id="upSellProductByNum" parameterType="int" resultMap="ProductResult">
+		SELECT * FROM
+		(SELECT
+		ROWNUM RNUM, A.* FROM
+		(SELECT * FROM PRODUCT ORDER BY P_DISCOUNT DESC) A)
+		WHERE RNUM &lt;= #{i}
+	</select>
+	
+	<select id="selectNewSell" resultMap="ProductResult">
+		SELECT * FROM PRODUCT ORDER BY P_INDATE DESC
+	</select>
+	
+	<select id="selectNewSellByIndex" parameterType="int" resultMap="ProductResult">
+		SELECT * FROM PRODUCT 
+		WHERE rownum &lt;=#{index} order by P_INDATE DESC ;
+	</select>
+	<select id="selectSaleSell" resultMap="ProductResult">
+		SELECT * FROM PRODUCT
+		WHERE P_SELL !=0 ORDER BY P_SELL DESC
+	</select>
+</mapper>
+
+
+

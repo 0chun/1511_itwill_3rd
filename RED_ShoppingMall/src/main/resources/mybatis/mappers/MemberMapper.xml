@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="mybatis.mappers.MemberMapper">
+  	<resultMap type="Member" id="MemberResult">
+  		<id property="m_id" column="m_id"/>
+  		<result property="m_password" column="m_password"/>
+  		<result property="m_name" column="m_name"/>
+  		<result property="m_sex" column="m_sex"/>
+  		<result property="m_phone" column="m_phone"/>
+  		<result property="m_zipcode" column="m_zipcode"/>
+  		<result property="m_address" column="m_address"/>
+  		<result property="m_email" column="m_email"/>
+  	</resultMap>
+  	<resultMap type="Zip" id="ZipResult">
+  		<id property="zipcode" column="zipcode"/>
+  		<result property="sido" column="sido"/>
+  		<result property="gugun" column="gugun"/>
+  		<result property="dong" column="dong"/>
+  		<result property="bldg" column="bldg"/>
+  		<result property="bunji" column="bunji"/>
+  	</resultMap>
+  	
+  <select id="selectByMemberId" 
+   parameterType="String" 
+   resultMap="MemberResult">
+      SELECT m_id,m_password,m_name,m_sex,m_phone,m_zipcode,m_address,m_email FROM MEMBER 
+      WHERE m_id = #{m_id}
+   </select>
+  <select id="findZip" 
+   parameterType="String" 
+   resultMap="ZipResult">
+      SELECT zipcode,sido,gugun,dong,bldg,bunji FROM ZIP 
+      WHERE dong LIKE '%' || #{dong} || '%'
+   </select>
+    <select id="selectAllMember" 
+   parameterType="java.util.List" 
+   resultMap="MemberResult">
+      SELECT * FROM MEMBER 
+   </select>
+   <insert id="insertMember" parameterType="Member" >
+   INSERT INTO MEMBER 
+   VALUES(#{m_id},#{m_password},#{m_name},#{m_sex},#{m_phone},#{m_zipcode},#{m_address},#{m_email})
+   </insert>
+   <update id="updateMember" parameterType="Member" >
+   UPDATE MEMBER
+   SET m_password = #{m_password}, m_name = #{m_name}, m_sex = #{m_sex}, 
+   m_phone = #{m_phone}, m_zipcode = #{m_zipcode}, m_address = #{m_address}, m_email = #{m_email} where m_id = #{m_id}
+   </update>
+   <delete id="deleteByMemberId" 
+   parameterType="java.lang.String">
+  	DELETE FROM MEMBER WHERE m_id=#{m_id}
+   </delete>
+   <select id="existedMember" parameterType="string" resultType="int">
+		select count(*) as cnt 
+		from MEMBER 
+		where m_id=#{m_id}
+	</select>
+  </mapper>

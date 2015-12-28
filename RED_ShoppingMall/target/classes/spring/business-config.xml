@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Uncomment and add your base-package here: <context:component-scan base-package="org.springframework.samples.service"/> -->
+	<!-- DAO, Service File -->
+
+	<import resource="datasource-config.xml" />
+
+	<!-- Product -->
+	<bean id="productDao" class="com.itwill.red.dao.impl.ProductDaoImpl">
+		<property name="productMapper" ref="productMapper"/>
+	</bean>
+
+	<bean id="productService" class="com.itwill.red.service.impl.ProductServiceImpl">
+		<property name="productDao" ref="productDao" />
+	</bean>
+	
+	<bean id="prdService" class="com.itwill.red.service.impl.ProductServiceImpl">
+		<property name="productDao" ref="productDao" />
+	</bean>
+
+	<!-- Member -->
+	<bean id="memberDao" class="com.itwill.red.dao.impl.MemberDaoImpl" >
+		<property name="memberMapper" ref="memberMapper"/>
+	</bean>
+
+	<bean id="memberService" class="com.itwill.red.service.impl.MemberServiceImpl">
+		<property name="memberDao" ref="memberDao" />
+	</bean>
+	
+	<!-- Review -->
+	<bean id="reviewsDao" class="com.itwill.red.dao.impl.ReviewsDaoImpl">
+		<property name="sqlSession" ref="sqlSession"/>
+	</bean>	
+	
+	<bean id="reviewService" class="com.itwill.red.service.impl.ReviewServiceImpl">
+		<property name="reviewsDao" ref="reviewsDao"/>
+	</bean>
+	
+	<!-- Orders & Orders Detail -->
+	<bean id="ordersDao" class="com.itwill.red.dao.impl.OrdersDaoImpl">
+		<property name="sqlSession" ref="sqlSession"/>
+	</bean>	
+	<bean id="ordersDetailDao" class="com.itwill.red.dao.impl.OrdersDetailDaoImpl">
+		<property name="sqlSession" ref="sqlSession"/>
+	</bean>	
+	<bean id="ordersService" class="com.itwill.red.service.impl.OrdersServiceImple">
+		<property name="ordersDao" ref="ordersDao"/>
+	</bean>
+	
+	<bean id="ordersDetatilService" class="com.itwill.red.service.impl.OrderDetatilServiceImpl">
+		<property name="orderDetatilDao" ref="ordersDetailDao"/>
+	</bean>
+	
+	<!-- WishList & WishList Detail -->
+	<bean id="wishListDao" class="com.itwill.red.dao.impl.WishListDaoImpl">
+		<property name="wishListMapper" ref="wishListMapper"/>
+	</bean>
+	<bean id="wishListService" class="com.itwill.red.service.impl.WishListServiceImpl">
+		<property name="wishListDao" ref="wishListDao"/>
+		<property name="productService" ref="productService"/>
+	</bean>
+</beans>
